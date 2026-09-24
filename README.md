@@ -25,14 +25,6 @@ Linphone is dual licensed, and is available either :
 
 - Tutorials : https://gitlab.linphone.org/BC/public/tutorials/-/tree/master/android/kotlin
 
-# What's new
-
-6.0.0 release is a completely new version, designed with UX/UI experts and marks a turning point in design, features, and user experience. The improvements make this version smoother and simpler for both developers and users.
-
-You can take a look at the [CHANGELOG.md](CHANGELOG.md) file for a non-exhaustive list of changes of this new version and of the newly added features, the most exciting ones being the improved fluidity, a real multi-accounts support and asymmetrical video in calls.
-
-This release only works on Android OS 9.0 and newer.
-
 # Building the app
 
 If you have Android Studio, simply open the project, wait for the gradle synchronization and then build/install the app.  
@@ -144,26 +136,6 @@ Execution failed for task ':app:processDebugGoogleServices'.
 ```
 error when building, make sure you have replaced the ```app/google-services.json``` file by yours (containing your package name).
 If you don't have such file because you don't rely on Firebase Cloud Messaging features nor Crashlytics, delete the file instead.
-
-## Firebase push notifications
-
-Now that Google Cloud Messaging has been deprecated and will be completely removed on April 11th 2019, the only official way of using push notifications is through Firebase.
-
-However to make Firebase push notifications work, the project needs to have a ```app/google-services.json``` file that contains the configuration.  
-We have archived our own, so you can build your linphone-android application and still receive push notifications from our free SIP service (sip.linphone.org).
-If you delete it, you won't receive any push notification.
-
-If you have your own push server, replace this file by yours.
-
-## Translations
-
-We no longer use transifex for the translation process, instead we have deployed our own instance of [Weblate](https://weblate.linphone.org/).
-
-Due to the full app rewrite we can't re-use previous translations, so we'll be very happy if you want to contribute.
-
-<a href="https://weblate.linphone.org/engage/linphone/">
-<img src="https://weblate.linphone.org/widget/linphone/linphone-android-6-2/multi-auto.svg" alt="Translation status" />
-</a>
 
 # CONTRIBUTIONS
 
