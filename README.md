@@ -1,18 +1,11 @@
+A fork of Belledonne Communications' android app.
 
-[![pipeline status](https://gitlab.linphone.org/BC/public/linphone-android/badges/master/pipeline.svg)](https://gitlab.linphone.org/BC/public/linphone-android/commits/master) 
-[![weblate status](https://weblate.linphone.org/widget/linphone/linphone-android-6-0/status-badge.png)](https://weblate.linphone.org/engage/linphone/)
+This fork has been modified to remove most of the UI and functionality to leave only a call answer screen, no notifications, no account configuration using UI, no call history and contacts list.
+This is made so that the app acts as a plugin to another master application which sends it all configuration info as well as commands to start/end calls, broadcasts are used for two communication and telemetry between the slave and master applications.
 
-Linphone is an open source softphone for voice and video over IP calling and instant messaging.
+This application fork is meant to run on e-WG200 devices as a companion app for the closed source LWP application running on that device.
 
-It is fully SIP-based, for all calling, presence and IM features.
-
-General description is available from [linphone web site](https://linphone.org).
-
-### How to get it
-
-[<img src="metadata/google-play-badge.png" height="60" alt="Get it on Google Play">](https://play.google.com/store/apps/details?id=org.linphone)[<img src="metadata/f-droid-badge.png" height="60" alt="Get it on F-Droid">](https://f-droid.org/en/packages/org.linphone/)
-
-You can also download APKs signed with our key from [our website](https://download.linphone.org/releases/android/?C=M;O=D).
+For any questions or requests concerning the integration or installation of your own code or application on the device as permitted by the GPL AFFERO license you may contact us by creating a ticket on: https://magneta.odoo.com/en/helpdesk/support-4
 
 ### License
 
