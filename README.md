@@ -303,7 +303,7 @@ This modified fork is maintained by Magneta for its specific integration require
 
 Linphone and related names remain the property of their respective owners.
 
-## Support and Contributions
+## Support
 
 For questions related to this fork, its integration, or its installation on e-WG200 devices, please use the following support portal:
 
