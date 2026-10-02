@@ -1,147 +1,96 @@
-A fork of Belledonne Communications' android app.
+# 📲 Baresip Android Integration
 
-This fork has been modified to remove most of the UI and functionality to leave only a call answer screen, no notifications, no account configuration using UI, no call history and contacts list.
-This is made so that the app acts as a plugin to another master application which sends it all configuration info as well as commands to start/end calls, broadcasts are used for two communication and telemetry between the slave and master applications.
+## 🛠️ Setup
 
-This application fork is meant to run on e-WG200 devices as a companion app for the closed source LWP application running on that device.
+1. **Clone the project**
+   ```bash
+   git clone https://git.app-magneta.fr/emerit/sip/emerit-sip-app.git
+   cd <project-folder>
+   ```
 
-For any questions or requests concerning the integration or installation of your own code or application on the device as permitted by the GPL AFFERO license you may contact us by creating a ticket on: https://magneta.odoo.com/en/helpdesk/support-4
+2. **Install the appropriate version of the Android NDK**
 
-### License
+   This project uses Android NDK version `27.2.12479018`.  
+   Make sure to download and install this version via Android Studio's SDK Manager  
+   or manually from the official [NDK archives](https://developer.android.com/ndk/downloads).
 
-Copyright © Belledonne Communications
+3. **Update the NDK path in the Makefile**
 
-Linphone is dual licensed, and is available either :
+   Open the `Makefile` located in the `baresip` module,  
+   and replace the values of `NDK_VERSION` and `NDK_PATH` with your local configuration:
+   ```make
+   NDK_VERSION := <your-ndk-version>
+   NDK_PATH := <your-ndk-path>
+   ```
 
- - under a [GNU/GPLv3 license](https://www.gnu.org/licenses/gpl-3.0.en.html), for free (open source). Please make sure that you understand and agree with the terms  of this license before using it (see LICENSE file for details).
+---
 
- - under a proprietary license, for a fee, to be used in closed source applications. Contact [Belledonne Communications](https://linphone.org/contact) for any question about costs and services.
+## ⚙️ Compilation
 
-### Documentation
+1. **Navigate to the `baresip` module**
+   ```bash
+   cd baresip
+   ```
 
-- Supported features and RFCs : https://www.linphone.org/linphone-softphone/#linphone-fonctionnalites
+2. **Download dependencies**
+   ```bash
+   make download-dependencies
+   ```
+   This command fetches and installs all required third-party dependencies for building `baresip`.
 
-- Linphone public wiki : https://wiki.linphone.org/xwiki/wiki/public/view/Linphone/
+3. **Build native libraries**
+   ```bash
+   make generate
+   ```
+   This command will:
+    - Compile and link the `libbaresip` native library
+    - Target the following Android architectures:
+        - `armeabi-v7a`
+        - `arm64-v8a`
 
-- Tutorials : https://gitlab.linphone.org/BC/public/tutorials/-/tree/master/android/kotlin
+---
 
-# Building the app
+## 📦 Build the Android App
 
-If you have Android Studio, simply open the project, wait for the gradle synchronization and then build/install the app.  
-It will download the linphone library from our Maven repository as an AAR file so you don't have to build anything yourself.
-
-If you don't have Android Studio, you can build and install the app using gradle:
-```
-./gradlew assembleDebug
-```
-will compile the APK file (assembleRelease to instead if you want to build a release package), and then
-```
-./gradlew installDebug
-```
-to install the generated APK in the previous step (use installRelease instead if you built a release package).
-
-APK files are stored within ```./app/build/outputs/apk/debug/``` and ```./app/build/outputs/apk/release/``` directories.
-
-When building a release AppBundle, use releaseAppBundle target instead of release.   
-Also make sure you have a NDK installed and that you have an environment variable named ```ANDROID_NDK_HOME``` that contains the path to the NDK.  
-This is to be able to include native libraries symbols into app bundle for the Play Store.
-
-## Building a local SDK
-
-1. Clone the linphone-sdk repository from out gitlab:
-```
-git clone https://gitlab.linphone.org/BC/public/linphone-sdk.git --recursive
-```
-
-2. Follow the instructions in the linphone-sdk/README file to build the SDK.
-
-3. Create or edit the gradle.properties file in $GRADLE_USER_HOME (usually ~/.gradle/) and add the absolute path to your linphone-sdk build directory, for example:
-```
-LinphoneSdkBuildDir=/home/<username>/linphone-sdk/build/
+Once the native libraries are compiled, the Android application is ready to be built using **Android Studio** or the **Gradle CLI**:
+```bash
+./gradlew assembleRelease
 ```
 
-4. Rebuild the app in Android Studio.
+---
 
-## Native debugging
+## 🧾 Configuration
 
-1. Install LLDB from SDK Tools in Android-studio.
+SIP configuration can be found at:
 
-2. In Android-studio go to Run->Edit Configurations->Debugger.
-
-3. Select 'Dual' or 'Native' and add the path to linphone-sdk debug libraries (build/libs-debug/ for example).
-
-4. Open native file and put your breakpoint on it.
-
-5. Make sure you are using the debug AAR in the app/build.gradle script and not the release one (to have faster builds by default the release AAR is used even for debug APK flavor).
-
-6. Debug app.
-
-## Known issues
-
-- If you have the following build issue `AAPT: error: resource drawable/linphone_logo_tinted (aka org.linphone:drawable/linphone_logo_tinted) not found`, delete the `app/src/main/res/xml/contacts.xml` file (you can do it simply with `git clean -f` command) and start the build again.
-
-- If you encounter the `couldn't find "libc++_shared.so"` crash when the app starts, simply clean the project in Android Studio (under Build menu) and build again.
-Also check you have built the SDK for the right CPU architecture using the `-DLINPHONESDK_ANDROID_ARCHS=armv7,arm64,x86,x86_64` cmake parameter.
-
-- Push notification might not work when app has been started by Android Studio consecutively to an install. Remove the app from the recent activity view and start it again using the launcher icon to resolve this.
-
-## Troubleshooting
-
-### Behavior issue
-
-When submitting an issue on our [Github repository](https://github.com/BelledonneCommunications/linphone-android), please follow the template and attach the matching library logs.
-
-Starting 6.0.0 release, logs are always enabled and stored locally on the device, you can clear them/upload them securely on our server for sharing by going into the Help → Troubleshooting page.
-
-### Native crash
-
-First of all, to be able to get a symbolized stack trace, you need the debug version of our libraries.
-
-If you haven't built the SDK locally (see [building a local SDK](#BuildingalocalSDK)), here's how to get them:
-
-1. Go to our [maven repository](https://download.linphone.org/maven_repository/org/linphone/linphone-sdk-android/) and find the directory that matches the version of our SDK that crashed.
-
-2. Download the linphone-sdk-android-<version>-libs-debug.zip archive.
-
-3. Extract the symbolized libraries somewhere on your computer, it will create a ```libs-debug``` directory.
-
-Now you need the ```ndk-stack``` tool and possibly ```adb logcat```.
-If your computer isn't used for Android development, you can download those tools from [Google website](https://developer.android.com/studio#downloads), in the ```Command line tools only``` section.
-
-Once you have the debug libraries and the proper tools installed, you can use the ```ndk-stack``` tool to symbolize your stacktrace. Note that you also need to know the architecture (armv7, arm64, x86, etc...) of the libraries that were used.
-
-If you know the CPU architecture of your device (most probably arm64 if it's a recent device) you can use the following to get the stacktrace from a device plugged to a computer:
 ```
-adb logcat -d | ndk-stack -sym ./libs-debug/arm64-v8a/
+app/src/main/assets/config
 ```
-If you don't know the CPU architecture, use the following instead:
-```
-adb logcat -d | ndk-stack -sym ./libs-debug/`adb shell getprop ro.product.cpu.abi | tr -d '\r'` 
-```
-Warning: This command won't print anything until you reproduce the crash!
 
-Starting [NDK r29](https://github.com/android/ndk/wiki/Changelog-r29) you will be able to directly use the ```libs-debug.zip``` file in ```ndk-stack -sym``` argument.
+- SIP server and account behavior
+- Audio input/output and codec settings
+- Network, media transport, and security protocols
+---
 
-## Create an APK with a different package name
+## 📦 Libraries & Licenses
 
-Simply edit the ```app/build.gradle.kts``` file and change the value of the ```packageName``` variable.
-The next build will automatically use this value everywhere thanks to ```manifestPlaceholders``` feature of gradle and Android.
+This project relies on several third-party open-source libraries. Below is a list of the main dependencies and their associated licenses:
 
-We no longer build the debug flavor with a different package name, but if you still want that behavior you only have to change the value of ```useDifferentPackageNameForDebugBuild``` to ```true```. When enabled, app built and installed by Android studio will have ```org.linphone.debug``` package name instead of ```org.linphone```.
+| Library           | Repository URL                                                                 | License        |
+|------------------|----------------------------------------------------------------------------------|----------------|
+| abseil-cpp        | https://github.com/abseil/abseil-cpp                                            | Apache 2.0     |
+| amr               | https://git.code.sf.net/p/opencore-amr/code.git                                 | Apache 2.0     |
+| baresip           | https://github.com/baresip/baresip                                              | BSD-3-Clause   |
+| bcg729            | https://github.com/BelledonneCommunications/bcg729                              | GPL-3.0        |
+| codec2            | https://github.com/drowe67/codec2                                               | LGPL-2.1       |
+| g7221             | https://github.com/juha-h/libg7221                                              | BSD-3-Clause   |
+| openssl           | https://github.com/openssl/openssl                                              | Apache 2.0     |
+| opus              | https://github.com/xiph/opus                                                    | BSD            |
+| re                | https://github.com/baresip/re                                                   | BSD-3-Clause   |
+| sndfile           | https://github.com/juha-h/libsndfile                                            | LGPL-2.1       |
+| spandsp           | https://github.com/juha-h/spandsp                                               | LGPL-2.1       |
+| tiff              | https://gitlab.com/libtiff/libtiff                                              | HPND (libtiff) |
+| webrtc            | https://github.com/juha-h/libwebrtc                                             | BSD            |
+| vo-amrwbenc       | https://git.code.sf.net/p/opencore-amr/vo-amrwbenc.git                          | Apache 2.0     |
+| zrtpcpp           | https://github.com/juha-h/ZRTPCPP                                               | GPL-3.0        |
 
-If you encounter
-```
-Execution failed for task ':app:processDebugGoogleServices'.
-> No matching client found for package name 'your package name'
-```
-error when building, make sure you have replaced the ```app/google-services.json``` file by yours (containing your package name).
-If you don't have such file because you don't rely on Firebase Cloud Messaging features nor Crashlytics, delete the file instead.
-
-# CONTRIBUTIONS
-
-In order to submit a patch for inclusion in linphone's source code:
-
-1. First make sure your patch applies to latest git sources before submitting: patches made to old versions can't and won't be merged.
-2. Fill out and send us an email with the link of pull-request and the [Contributor Agreement](https://linphone.org/sites/default/files/bc-contributor-agreement_0.pdf) for your patch to be included in the git tree.
-
-The goal of this agreement to grant us peaceful exercise of our rights on the linphone source code, while not losing your rights on your contribution.

@@ -1,0 +1,83 @@
+auto_start yes
+log_level 4
+poll_method epoll
+sip_trans_bsize 128
+sip_verify_server no
+call_local_timeout 120
+call_max_calls 4
+
+audio_player aaudio,default
+audio_source aaudio,default
+audio_alert aaudio,default
+
+augain_gain 3.0
+audio_level no
+ausrc_format s16
+auenc_format s16
+auplay_format s16
+audec_format s16
+
+rtp_tos 184
+rtcp_mux no
+
+jitter_buffer_type adaptive
+jitter_buffer_delay 5-10
+jitter_buffer_wish 6
+
+rtp_stats no
+dyn_dns yes
+
+# Remove opus to enable AEC compatibility
+# module opus.so
+# opus_bitrate 28000
+# opus_samplerate 16000
+# opus_cbr no
+# opus_inbandfec yes
+# opus_application voip
+# opus_stereo no
+# opus_sprop_stereo no
+
+# Preferred codecs with working AEC
+module g711.so
+audio_codecs pcmu/8000
+
+# Keep others if needed for fallback
+module amr.so
+module g722.so
+module g7221.so
+module g726.so
+module g729.so
+
+# Audio processing modules
+module webrtc_aecm.so
+audio_filter webrtc_aecm
+webrtc_aec_extended_filter yes
+
+module aaudio.so
+module augain.so
+
+# STUN/TURN/ICE/ZRTP support
+module stun.so
+module turn.so
+module ice.so
+ice_turn no
+ice_nomination regular
+
+module srtp.so
+module dtls_srtp.so
+dtls_srtp_use_ec prime256v1
+module zrtp.so
+zrtp_hash yes
+
+# App-specific modules
+module_tmp uuid.so
+module_tmp account.so
+module_app contact.so
+module_app debug_cmd.so
+module_app mwi.so
+
+# Optional: keep OpenSL ES as fallback
+
+# Input device (if used)
+evdev_device /dev/input/event0
+dyn_dns no
