@@ -42,7 +42,7 @@ The LWP application acts as the main controller, providing configuration informa
 
 **2. Modified Linphone – Companion Application**
 
-The modified Linphone application manages the VoIP functionality using the Linphone SDK and exposes a simplified call-answering interface.
+The modified Linphone application manages VoIP functionality using the Linphone SDK and exposes a simplified call-answering interface.
 
 It receives configuration data and operational commands from the controller application, including instructions to initiate and terminate calls.
 
@@ -123,19 +123,45 @@ The Corresponding Source for any distributed binary must include all material re
 
 The source code corresponding to a distributed release should be identified by its matching Git tag or commit.
 
-### Device Integration and Installation Information
+## Integration, Modification and Device Installation
 
-This application was originally developed for deployment on e-WG200 devices.
+### e-WG200 Production Environment
 
-Users or developers wishing to integrate their own software with this fork, build a modified version, or obtain information concerning installation on supported devices may contact Magneta through the following support portal:
+This application was originally developed for deployment on e-WG200 devices alongside Magneta's proprietary LWP application.
 
-**https://magneta.odoo.com/en/helpdesk/support-4**
+The production firmware of the e-WG200 is configured as a restricted environment. Due to the device's hardware and software configuration, including its small display, lack of touchscreen and disabled Android Debug Bridge (ADB), users cannot directly install additional Android applications or independently replace the installed Linphone companion application through the standard production interface.
 
-Please create a support ticket describing your request, the version of the application concerned and the target device.
+### Development Environment
 
-Where required by the applicable open-source licenses, relevant installation information for covered software distributed with the device must be made available to eligible recipients.
+Magneta provides an alternative development firmware for users wishing to develop, install and execute their own applications or modifications on the e-WG200 device.
 
-The support portal is provided as an additional communication channel and does not replace or restrict the rights granted directly by the software licenses.
+This development environment includes:
+
+- Android Debug Bridge (ADB) access.
+- Root access.
+- The ability to install independently compiled Android applications.
+- The ability to install and execute modified versions of this Linphone fork.
+- The ability to integrate alternative controller applications or implement custom functionality.
+
+**Important:** Installing the development firmware replaces the production environment, including the proprietary LWP application.
+
+Under the current device provisioning procedure, switching from the production firmware to the development environment requires the device to be physically returned to Magneta for reconfiguration.
+
+Once the development firmware has been installed, users can access the device through ADB and perform their own development, integration and installation operations.
+
+### Requesting Development Access
+
+Users wishing to install modified versions of this application, integrate their own software or request the alternative development firmware can contact Magneta through its support portal.
+
+Please create a support ticket at:
+
+https://magneta.odoo.com/en/helpdesk/support-4
+
+When submitting your request, please indicate that you wish to obtain development access to an e-WG200 device running the modified Linphone companion application.
+
+Magneta will provide information concerning the current reconfiguration procedure.
+
+This support service is provided in addition to, and does not limit, the rights granted to recipients under the applicable GNU GPLv3 and AGPLv3 licenses. Any mandatory installation-information obligations under those licenses remain applicable independently of this support procedure.
 
 ## Building the Application
 
@@ -156,7 +182,7 @@ To build this application, you will need:
 3. Allow Gradle synchronization to complete.
 4. Resolve or download the required Linphone SDK dependencies.
 5. Select the desired build configuration.
-6. Build and install the application.
+6. Build and install the application on a compatible Android device.
 
 By default, the Gradle configuration can retrieve the Linphone SDK as an AAR dependency from the configured Maven repository.
 
@@ -168,7 +194,7 @@ To generate a debug APK:
 ./gradlew assembleDebug
 ```
 
-To install the debug APK on a connected Android device:
+To install the debug APK on a connected Android device with ADB access enabled:
 
 ```bash
 ./gradlew installDebug
@@ -187,9 +213,13 @@ app/build/outputs/apk/debug/
 app/build/outputs/apk/release/
 ```
 
+When building a release Android App Bundle, use the appropriate App Bundle Gradle task defined by the project.
+
 Depending on the build configuration, the Android NDK may be required.
 
 If necessary, configure the `ANDROID_NDK_HOME` environment variable to point to your installed NDK.
+
+**Note:** Direct installation through ADB is not available on e-WG200 devices running the standard production firmware. Refer to the *Integration, Modification and Device Installation* section for information about the alternative development environment.
 
 ### Building with a Local Linphone SDK
 
@@ -198,9 +228,7 @@ The application can also be configured to use a locally compiled version of the 
 Clone the upstream SDK repository, including its submodules:
 
 ```bash
-git clone \
-  https://gitlab.linphone.org/BC/public/linphone-sdk.git \
-  --recursive
+git clone https://gitlab.linphone.org/BC/public/linphone-sdk.git --recursive
 ```
 
 Follow the instructions provided in the Linphone SDK repository to build the required Android libraries.
@@ -220,6 +248,40 @@ LinphoneSdkBuildDir=/home/<username>/linphone-sdk/build/
 Rebuild the Android application using Android Studio or Gradle.
 
 Ensure that the version of the SDK used to compile the application is compatible with this fork.
+
+## Native Debugging
+
+For debugging issues related to the underlying native Linphone SDK:
+
+1. Install LLDB from Android Studio's SDK Tools.
+2. Open **Run → Edit Configurations → Debugger**.
+3. Select the appropriate native debugging mode.
+4. Configure the path to the Linphone SDK debug libraries.
+5. Ensure that the application uses a compatible debug AAR rather than stripped release libraries.
+6. Open the relevant native source file and set your breakpoints.
+7. Start the application in debug mode.
+
+### Symbolicating Native Crashes
+
+To obtain a symbolicated stack trace, use the debug symbols corresponding to the exact Linphone SDK version used by the application.
+
+If you are using a prebuilt Linphone SDK, download its matching debug symbols from the upstream Maven repository.
+
+Extract the debug libraries and use the Android NDK's `ndk-stack` utility.
+
+For example, on an arm64 device:
+
+```bash
+adb logcat -d | ndk-stack -sym ./libs-debug/arm64-v8a/
+```
+
+Alternatively, to automatically select the device architecture:
+
+```bash
+adb logcat -d | ndk-stack -sym ./libs-debug/$(adb shell getprop ro.product.cpu.abi | tr -d '\r')
+```
+
+Native debugging through ADB requires a development environment with ADB enabled.
 
 ## Documentation
 
